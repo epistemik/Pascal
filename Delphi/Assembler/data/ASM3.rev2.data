@@ -1,0 +1,16 @@
+/Mystery Program [REVISED] -- what does it do ?/
+//
+/variable X = memory location 23/
+//
+[1]   DSP  [1]
+/ cannot use an immediate value as operand - need a label /
+      LDA   Y
+      SUB   X
+      JZ   [2]
+      ADD   X
+      INC
+      STA   Y
+      JMP  [1]
+[2]   HLT
+X     BYTE  23
+Y     BYTE  2

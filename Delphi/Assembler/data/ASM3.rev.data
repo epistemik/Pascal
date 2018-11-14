@@ -1,0 +1,24 @@
+/Mystery Program -- what does it do ?/
+//
+/variable X = memory location 23/
+//
+[1]   DSP  [1]
+/ the next 3 lines are the equivalent of instr 'LDA 02' but where the    /
+/ memory location 02 (which is displayed by the first instr) can be used /
+/ directly - this location cannot be accessed with a label as operand    /
+/ see file ASM3.rev2.data								    /
+      BYTE 91
+      BYTE 00
+      BYTE 02
+      SUB   X
+      JZ   [2]
+      ADD   X
+      INC
+/ similarly, the next 3 lines are the equivalent of 'STA 02' - which updates /
+/ the display location each time through the program 				  /
+      BYTE 39
+      BYTE 00
+      BYTE 02
+      JMP  [1]
+[2]   HLT
+X     BYTE  23

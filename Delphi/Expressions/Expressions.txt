@@ -1,0 +1,44 @@
+      The Bracket Matching Algorithm used in this program
+   ---------------------------------------------------------
+This follows very closely what was described in class.  It is implemented in three
+procedures; the names are not the ones used in class but their functions are the same:
+
+	Brackets,  Process_right_bracket,  Convert_left_to_right,  Convert_to_postfix.
+
+Procedure  BRACKETS:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Repeat the following until end-of-line:
+	1. Read the next character.
+	2. If it is NOT a right bracket, push it on the stack S.
+	3. If it is a right bracket, do the following
+
+     (a)  procedure  PROCESS_RIGHT_BRACKET:
+     Pop characters off of stack S and push them onto a temporary stack 
+until you reach a left bracket (this is the bracket that matches with the 
+right bracket you just read).  Pop that bracket off of S.
+     The temporary stack now contains all the characters that were in-between
+the two brackets, and they are in the same order that they were initially read
+(the first one read is on the top of the temporary stack).
+
+     (b)  procedure  CONVERT_LEFT_TO_RIGHT:
+     "Process" the characters between the two brackets (i.e. the ones that
+are on the temporary stack).  In general you can do any sort of processing you
+like.  For example, you could evaluate this expression. In the current program,
+the infix expression is converted to postfix (this is done by successive calls
+to "Convert_to_postfix").
+
+     (c)  The processing in step (b), whatever it is, is assumed to return an
+"answer".  In this case the answer returned is a string containing a postfix
+expression.  PUSH this answer onto stack S.
+
+     (d)  When end-of-line is encountered, you need to do exactly the same 
+processing as in step 3, EXCEPT:  there is no left bracket on stack S to 
+"match" with end-of-line, so the loop in 3(a) will not terminate.  I could 
+have written a separate procedure to handle end-of-line, but instead I used
+a "trick" which allows me to use the procedure "Process_right_bracket" when 
+I encounter end-of-line.  The "trick" is to treat beginning-of-line as a left
+bracket and end-of-line as its matching right bracket.  The way this is 
+implemented is simply to push a left bracket onto stack S just before reading
+begins.  When end-of-line is encountered, "Process_right_bracket" is called
+and the left bracket representing beginning-of-line is sitting at the bottom 
+of stack S.	*}

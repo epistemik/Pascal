@@ -1,0 +1,15 @@
+/ CSI 1101-X,  Winter 1999,  Assignment #8 /
+/ Mark Sattolo,  student# 428500 /
+/ Machine language file equivalent to that of the 'Mystery program' /
+/ see file 'asm3.rev.data' /
+  01  0  0
+  91  0  2
+  61  0 23
+  17  0 22
+  99  0 23
+  10
+  39  0  2
+  15  0  0
+  64
+  23
+   2

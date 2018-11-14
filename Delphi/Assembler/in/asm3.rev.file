@@ -1,0 +1,18 @@
+/ CSI 1101-X,  Winter 1999,  Assignment #8 /
+/ Mark Sattolo,  student# 428500 /
+/ Machine language file written by assembler a8 /
+/ Produced from ASM file 'asm3.rev.data' /
+  01  0  0
+  91
+  00
+  02
+  61  0 23
+  17  0 22
+  99  0 23
+  10
+  39
+  00
+  02
+  15  0  0
+  64
+  23
