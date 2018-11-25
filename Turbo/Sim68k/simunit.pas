@@ -85,12 +85,12 @@ begin
      hexString := '';
      for i := 0 to 1 do
         begin
-	hexDigit := Binary MOD $10;
-	if hexDigit < $A
-          then hexString := chr(48+hexDigit) + hexString  (* 0 to 9 *)
-	  else hexString := chr(55+hexDigit) + hexString; (* A to F *)
-	Binary := Binary DIV $10
-	end;{for}
+	        hexDigit := Binary MOD $10;
+	        if hexDigit < $A
+            then hexString := chr(48+hexDigit) + hexString  (* 0 to 9 *)
+	          else hexString := chr(55+hexDigit) + hexString; (* A to F *)
+	        Binary := Binary DIV $10
+	      end;{for}
      Byte2Hex := hexString  (* Here is the string *)
 end;
 
@@ -104,13 +104,13 @@ var
 begin
      hexString := '';
      for i := 0 to 3 do
-	begin
-	hexDigit := Binary MOD $10;
-	if hexDigit < $A
-          then hexString := chr(48+hexDigit) + hexString  (* 0 to 9 *)
-	  else hexString := chr(55+hexDigit) + hexString; (* A to F *)
-	Binary := Binary DIV $10
-	end;{for}
+	     begin
+	       hexDigit := Binary MOD $10;
+	       if hexDigit < $A
+           then hexString := chr(48+hexDigit) + hexString  (* 0 to 9 *)
+	         else hexString := chr(55+hexDigit) + hexString; (* A to F *)
+	       Binary := Binary DIV $10
+	     end;{for}
      Word2Hex := hexString  (* Here is the String *)
 end;
 
@@ -128,24 +128,24 @@ begin
      (* the least significant word *)
      tempW := Binary AND $0000FFFF;
      for i := 0 to 3 do
-	begin
-	hexDigit := tempW MOD $10;
-	if hexDigit < $A
-          then hexString := chr(48+hexDigit) + hexString  (* 0 to 9 *)
-	  else hexString := chr(55+hexDigit) + hexString; (* A to F *)
-	tempW := tempW DIV $10
-	end;{for}
+	     begin
+	       hexDigit := tempW MOD $10;
+	       if hexDigit < $A
+           then hexString := chr(48+hexDigit) + hexString  (* 0 to 9 *)
+	         else hexString := chr(55+hexDigit) + hexString; (* A to F *)
+	       tempW := tempW DIV $10
+	     end;{for}
 
      (* the most significant word *)
      tempW := (Binary AND $FFFF0000) SHR 16;
      for i := 0 to 3 do
-	begin
-	hexDigit := tempW MOD $10;
-	if hexDigit < $A
-          then hexString := chr(48+hexDigit) + hexString  (* 0 to 9 *)
-	  else hexString := chr(55+hexDigit) + hexString; (* A to F *)
-	tempW := tempW DIV $10
-	end;{for}
+	     begin
+	       hexDigit := tempW MOD $10;
+	       if hexDigit < $A
+           then hexString := chr(48+hexDigit) + hexString  (* 0 to 9 *)
+	         else hexString := chr(55+hexDigit) + hexString; (* A to F *)
+	       tempW := tempW DIV $10
+	     end;{for}
 
      Long2Hex := hexString  (* Here is the string *)
 end;
@@ -159,11 +159,11 @@ var
 begin
      hexWord := 0;
      for i := 1 to length(hex) do
-	begin
-	if hex[i] <= '9'
-	  then hexWord := Ord(hex[i])-48 + hexWord*$10  (* 0 to 9 *)
-	  else hexWord := Ord(hex[i])-55 + hexWord*$10; (* A to F *)
-	end;{for}
+	     begin
+	       if hex[i] <= '9'
+	         then hexWord := Ord(hex[i])-48 + hexWord*$10  (* 0 to 9 *)
+	         else hexWord := Ord(hex[i])-55 + hexWord*$10; (* A to F *)
+	     end;{for}
      Hex2Word := hexWord  (* Here is the Word *)
 end;
 
@@ -221,7 +221,7 @@ var
    pos: Integer;
 begin
      for pos := First to Last do
-     	SetBit( V, pos, GetBits(Value, pos-First, pos-First)=1 );
+     	  SetBit( V, pos, GetBits(Value, pos-First, pos-First)=1 );
 end;
 
 

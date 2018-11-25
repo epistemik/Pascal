@@ -55,7 +55,7 @@ type memorySize = $0000..$1000;  (* Memory *)
 var
 	 program_name: string;
 	 option: char;     (* Option chosen from the menu by the user *)
-	 Mnemo: array[0..31] of string;                  (* Mnemonics *)
+	 Mnemo:  array[0..31] of string;                  (* Mnemonics *)
 	 memory: array[memorySize] of byte ;  (* 4097 bytes of memory *)
 
 	 (* The CPU's registers *)
@@ -72,10 +72,10 @@ var
 	 D: array[0..1] of long ; (* Data Registers        *)
 	 A: array[0..1] of word ; (* Address Registers     *)
 
-	 MAR:     word ;  (* Memory Address Register *)
-	 MDR:     long ;  (* Memory Data Register    *)
-	 RW:      bit  ;  (* Read/Write Bit: READ=True;  WRITE=False *)
-	 DS:      twobits;(* Twobits Data Size: ByteSize=0, WordSize=1, LongSize=2 *)
+	 MAR:  word ;   (* Memory Address Register *)
+	 MDR:  long ;   (* Memory Data Register    *)
+	 RW:   bit  ;   (* Read/Write Bit: READ=True;  WRITE=False *)
+	 DS:   twobits; (* Twobits Data Size: ByteSize=0, WordSize=1, LongSize=2 *)
 
 
 (* Procedures and functions to help you manipulate instruction formats     *)
@@ -143,19 +143,19 @@ BEGIN
      reset(file_68b);
      address := $0000;
      while (not eof(file_68b)) do
-        BEGIN
-        read(file_68b, first_character);
-        if first_character = '/' then  (* Beginning of comment *)
-          repeat   (* Skip the comment *)
-            read(file_68b, ch)
-          until (ch = first_character) or eoln(file_68b);
-        while (not eoln(file_68b)) do
+       BEGIN
+         read(file_68b, first_character);
+         if first_character = '/' then  (* Beginning of comment *)
+           repeat   (* Skip the comment *)
+             read(file_68b, ch)
+           until (ch = first_character) or eoln(file_68b);
+         while (not eoln(file_68b)) do
            BEGIN
            read(file_68b, Memory[address]);
            address := address + $0001
            END;
-        readln(file_68b)
-        END;{while not eof}
+         readln(file_68b)
+       END;{while not eof}
      writeln ('Program loaded. ', address,' bytes in memory.');
      close(file_68b);
 END;
@@ -178,7 +178,7 @@ BEGIN
              longSize: MDR := ((memory[MAR]   * $1000000) AND $FF000000) OR
                               ((memory[MAR+1] * $10000)   AND $00FF0000) OR
                               ((memory[MAR+2] * $100)     AND $0000FF00) OR
-                              ( memory[MAR+3] AND $000000FF);
+                              ( memory[MAR+3]             AND $000000FF);
              END{case}
        else
 	  (* RW = FALSE = Write = copy an element from the CPU to memory *)
@@ -187,21 +187,21 @@ BEGIN
           else
              if DS = wordSize then
                BEGIN  (* wordSize *)
-               memory[MAR] := (MDR div $100) mod $100; (* MSB: 8 first bits *)
-               memory[MAR+1] := MDR mod $100; (* LSB: 8 last bits *)
+                 memory[MAR] := (MDR div $100) mod $100; (* MSB: 8 first bits *)
+                 memory[MAR+1] := MDR mod $100; (* LSB: 8 last bits *)
                END
              else BEGIN  (* longSize *)
-                  memory[MAR] := (MDR SHR 24) AND $000000FF;(* MSB: 8 first bits *)
-                  memory[MAR+1] := (MDR SHR 16) AND $000000FF;
-                  memory[MAR+2] := (MDR SHR 8) AND $000000FF;
-                  memory[MAR+3] := MDR mod $100
+                    memory[MAR] := (MDR SHR 24) AND $000000FF;(* MSB: 8 first bits *)
+                    memory[MAR+1] := (MDR SHR 16) AND $000000FF;
+                    memory[MAR+2] := (MDR SHR 8) AND $000000FF;
+                    memory[MAR+3] := MDR mod $100
                   END
      else
        (* Invalid Memory Address. *)
         BEGIN
-        writeln('*** ERROR *** AccessMemory uses the invalid address $', Word2Hex(MAR));
-        writeln('PC Address = ', Word2Hex(PC-2));
-        H := true;  (* End of simulation...! *)
+          writeln('*** ERROR *** AccessMemory uses the invalid address $', Word2Hex(MAR));
+          writeln('PC Address = ', Word2Hex(PC-2));
+          H := true;  (* End of simulation...! *)
         END;
 END;
 {proc Access_Memory}
@@ -221,53 +221,53 @@ var
       { Private to Controller}
       procedure Init;
       (* Initialize the simulator (PC and status bits). *)
-      BEGIN
+        BEGIN
            PC := $0000;
            C := False;
            V := False;
            Z := False;
            N := False;
            H := False;
-      END;
+        END;
       {private proc Init - used by proc Controller}
 
       { Private to Controller}
       procedure FetchOpCode;
       (* Fetch the OpCode from memory *)
-      BEGIN
+        BEGIN
            RW := true; {read}
            DS := wordSize;
            MAR := PC;
            PC := PC + 2;
            Access_Memory;
            Opcode := GetWord(MDR, false); {get LSW from MDR}
-      END;
+        END;
       {private proc FetchOpCode - used by proc Controller}
 
       { Private to Controller}
       procedure DecodeInstr;
       (* Update the fields (OpName, Size, NbOper, M1, N1, M2, N2, Data) *)
       (* according to given format. Uses GetBits. *)
-      BEGIN
+        BEGIN
            OpName := GetBits(OpCode, 11, 15);
            Size := GetBits(OpCode, 9, 10);
            NbOper := GetBits(OpCode, 8, 8) + 1;
            if (NbOper > 0) then   {SHOULD ALWAYS BE TRUE!}
              if not( FormatF1(OpName) ) then
                BEGIN
-               Data := GetBits(OpCode, 4, 7);
-               M2 := GetBits(OpCode, 1, 3);
-               N2 := GetBits(OpCode, 0, 0)
+                 Data := GetBits(OpCode, 4, 7);
+                 M2 := GetBits(OpCode, 1, 3);
+                 N2 := GetBits(OpCode, 0, 0)
                END
              else  {is FormatF1}
                 if not(OpName = 30) or not(OpName = 31) then
                   BEGIN
-                  M1 := GetBits(OpCode, 5, 7);
-                  N1 := GetBits(OpCode, 4, 4);
-                  M2 := GetBits(OpCode, 1, 3);
-                  N2 := GetBits(OpCode, 0, 0)
+                    M1 := GetBits(OpCode, 5, 7);
+                    N1 := GetBits(OpCode, 4, 4);
+                    M2 := GetBits(OpCode, 1, 3);
+                    N2 := GetBits(OpCode, 0, 0)
                   END;
-      END;
+        END;
       {private proc DecodeInstr - used by proc Controller}
 
    { Private to Controller}
@@ -281,30 +281,30 @@ var
          (* Fetch the address of first operand (in OpAddr1) *)
          if (FormatF1(OpName)) and (M1 = 3) then  {RELATIVE/ABSOLUTE ADDRESSING}
            BEGIN
-           RW := true; {read}
-           DS := wordSize;
-           MAR := PC;
-           PC := PC + 2;
-           Access_Memory;
-           OpAddr1 := GetWord(MDR, false); {get LSW of MDR}
+             RW := true; {read}
+             DS := wordSize;
+             MAR := PC;
+             PC := PC + 2;
+             Access_Memory;
+             OpAddr1 := GetWord(MDR, false); {get LSW of MDR}
            END;
          (* Fetch the address of second operand, if F1 and 2 operands. *)
          (* 2nd operand of an instruction with format F2 is in OpAddr2 *)
          if (M2 = 3) then
            BEGIN
-           RW := true; {read}
-           DS := wordSize;
-           MAR := PC;
-           Access_Memory;
-           PC := PC + 2;
-           OpAddr2 := GetWord(MDR, false); {get LSW of MDR}
+             RW := true; {read}
+             DS := wordSize;
+             MAR := PC;
+             Access_Memory;
+             PC := PC + 2;
+             OpAddr2 := GetWord(MDR, false); {get LSW of MDR}
            END;
          (* Check invalid number of operands. *)
          if (NbOper = 2) and ( not(FormatF1(OpName)) ) then
            BEGIN
-           write( '*** ERROR *** Invalid number of operands for (', Mnemo[Opname] );
-           writeln( ') at address PC = ', Word2Hex(PC-2) );
-           H := true;
+             write( '*** ERROR *** Invalid number of operands for (', Mnemo[Opname] );
+             writeln( ') at address PC = ', Word2Hex(PC-2) );
+             H := true;
            END
          END
    END;
@@ -331,22 +331,22 @@ var
    procedure FillTMP( var TmpReg: long;   (* Register to modify - TMPS, TMPD or TMPR *)
                           OpAddrNo: word; (* Address of operand (OpAddr1 or OpAddr2), for mode 11 *)
                           Size: twobits;  (* Data Size                             *)
-			  ModeAdr,                (* Required Addressing Mode      *)
-                                  RegNo: byte );  (* Register number for  An & Dn  *)
+			                    ModeAdr,        (* Required Addressing Mode      *)
+                          RegNo:  byte ); (* Register number for  An & Dn  *)
    (* Transfer data in the required temporary register *)
    BEGIN
    (* Depends on Addressing Mode *)
       case ModeAdr of
          $0: (* Data Register Direct *)
              BEGIN
-             TmpReg := D[RegNo];
-             if (Size = byteSize) then
-               BEGIN
-               SetByteL(TmpReg, 1, $00);
-               SetWord(TmpReg, true, $0000)
-               END
-             else if (Size = wordSize)
-		    then SetWord(TmpReg, true, $0000);
+               TmpReg := D[RegNo];
+               if (Size = byteSize) then
+                 BEGIN
+                   SetByteL(TmpReg, 1, $00);
+                   SetWord(TmpReg, true, $0000)
+                 END
+               else if (Size = wordSize)
+		             then SetWord(TmpReg, true, $0000);
              END;
 
          $1: (* Address Register Direct *)
@@ -375,7 +375,7 @@ var
          $6: (* Address Register Indirect with Post-Increment *)
              (* We need to access memory. *)
              BEGIN
-	       DS := Size;
+	             DS := Size;
                RW := true;
                MAR := A[RegNo];
                Access_Memory;
@@ -383,9 +383,9 @@ var
                A[RegNo] := A[RegNo] + NOB(Size);
              END;
 
-	 $7: (* Address Register Indirect with Pre-Decrement *)
-	     (* We need to access memory. *)
-	     BEGIN
+	       $7: (* Address Register Indirect with Pre-Decrement *)
+	           (* We need to access memory. *)
+	           BEGIN
                A[RegNo] := A[RegNo] - NOB(Size);
                DS := Size;
                RW := true;
@@ -394,29 +394,29 @@ var
                TmpReg := MDR;
              END;
 
-	 else BEGIN
-		(* This error should never occur, but just in case...! *)
-		write( '*** ERROR *** Invalid addressing mode (', ModeAdr );
-		writeln( ') at address PC = ', Word2Hex(PC-2) );
-		H := true;
-	      END
+	       else BEGIN
+		            (* This error should never occur, but just in case...! *)
+		            write( '*** ERROR *** Invalid addressing mode (', ModeAdr );
+		            writeln( ') at address PC = ', Word2Hex(PC-2) );
+		            H := true;
+	            END
       END;{case ModeAdr}
    END;
    {private proc FillTMP - used by proc Controller}
 
    { Private to Controller}
    procedure SetResult( TmpReg: long;   (* Source Register(TMPD...)     *)
-			OpAddrNo: word; (* Operand Address(OpAddr1...)  *)
-			Size:twobits;   (* Data Size                    *)
-			ModeAdr,        (* Required Addressing Mode     *)
-			        RegNo: byte);  (* Register Number for An & Dn *)
+			                  OpAddrNo: word; (* Operand Address(OpAddr1...)  *)
+			                  Size:twobits;   (* Data Size                    *)
+			                  ModeAdr,        (* Required Addressing Mode     *)
+			                  RegNo:  byte);  (* Register Number for An & Dn *)
      (* Transfer the contents of temporary register to Register or Memory *)
      BEGIN
        (* Depends on Addressing Mode *)
        case ModeAdr of
-	 $0: (* Data Register Direct *)
-	     case Size of
-		byteSize: SetBitsL(D[RegNo], 0, 7, TmpReg);
+	       $0: (* Data Register Direct *)
+	           case Size of
+		            byteSize: SetBitsL(D[RegNo], 0, 7, TmpReg);
                 wordSize: SetWord(D[RegNo], false, GetWord(TmpReg, false));
                 longSize: D[RegNo] := TmpReg;
              END;{case}
@@ -455,27 +455,27 @@ var
                RW := false;
                MDR := TmpReg;
                Access_Memory;
-	     END;
+	           END;
 
-	 $7: (* Address Register Indirect with Pre-Decrement           *)
-	     (* We need to access memory.                              *)
-	     (* ATTENTION: for some instructions, the address register *)
-	     (* has already been decremented by FillTMP                *)
-	     (* DO NOT decrement it a 2nd time here                    *)
-	     BEGIN
-	       DS := Size;
+	       $7: (* Address Register Indirect with Pre-Decrement           *)
+	           (* We need to access memory.                              *)
+	           (* ATTENTION: for some instructions, the address register *)
+	           (* has already been decremented by FillTMP                *)
+	           (* DO NOT decrement it a 2nd time here                    *)
+	           BEGIN
+	             DS := Size;
                RW := false;
                MAR := A[RegNo];
                MDR := TmpReg;
                Access_Memory;
-	     END;
+	           END;
 
-	 else {invalid ModeAdr}
-             BEGIN
+	       else {invalid ModeAdr}
+           BEGIN
              write( '*** ERROR *** Invalid Addressing Mode (', ModeAdr );
              writeln( ') at address PC = ', Word2Hex(PC-2) );
              H := true;
-	     END;
+	         END;
       END;{case ModeAdr}
    END;
    {private proc SetResult - used by proc Controller}
@@ -490,11 +490,11 @@ var
         then CheckCond := True
       else
          BEGIN
-         writeln( '*** ERROR *** ', Message, ' for ',
+           writeln( '*** ERROR *** ', Message, ' for ',
                    Mnemo[OpName], ' at address $', Word2Hex(PC-2) );
-         (* Set the H bit to True *)
-         H := true;
-         CheckCond := False
+           (* Set the H bit to True *)
+           H := true;
+           CheckCond := False
          END
    END;
    {private func CheckCond - used by proc Controller}
@@ -576,8 +576,8 @@ var
      iADDQ:  BEGIN
                FillTMP(TMPD, OpAddr2, Size, M2, N2);
                TMPS := $0 ;
-	       SetByteL(TMPS, 0, Data) ;
-	       {Sign extension if W or L ??}
+	             SetByteL(TMPS, 0, Data) ;
+	             {Sign extension if W or L ??}
                TMPR := TMPD + TMPS;
                SetZN(TMPR);
                SetSmDmRm (TMPS, TMPD, TMPR) ;
@@ -630,33 +630,33 @@ var
      iDIVS: BEGIN
                if CheckCond( (Size = 2), 'Invalid Data Size' ) then
                  BEGIN
-		 FillTMP(TMPS, OpAddr1, wordSize, M1, N1) ;
-		 if CheckCond( (TMPS <> $0), 'Division by Zero' ) then
+		               FillTMP(TMPS, OpAddr1, wordSize, M1, N1) ;
+		               if CheckCond( (TMPS <> $0), 'Division by Zero' ) then
                    BEGIN
-                   FillTMP(TMPD, OpAddr2, Size, M2, N2);
-                   V := ((TMPD div TMPS) < -32768) OR ((TMPD div TMPS) > 32767);
-                   if TMPS > $8000 then
-                     BEGIN
-                     i := $1;
-                     TMPS := (TMPS xor $FFFF) + 1;
-                     TMPD := (TMPD xor $FFFFFFFF) + 1
-                     END;
-                   if ((TMPD div TMPS) = 0) and (i = $1) then
-                     BEGIN
-                     SetWord(TMPR, false, $0000);
-                     TMPD := (TMPD xor $FFFFFFFF) + 1;
-                     SetWord(TMPR, true, TMPD mod TMPS)
-                     END
-                   else
+                     FillTMP(TMPD, OpAddr2, Size, M2, N2);
+                     V := ((TMPD div TMPS) < -32768) OR ((TMPD div TMPS) > 32767);
+                     if TMPS > $8000 then
                        BEGIN
-                       TMPR := TMPD div GetWord(TMPS, false) ;
-		       SetWord(TMPR, true, (TMPD mod GetWord(TMPS, false)))
+                         i := $1;
+                         TMPS := (TMPS xor $FFFF) + 1;
+                         TMPD := (TMPD xor $FFFFFFFF) + 1
                        END;
-		   SetZN(TMPR) ;
-		   C := false ;
-		   SetResult(TMPR, OpAddr2, Size, M2, N2) ;
-		   END { if div by 0 }
-		 END { if size = 2 }
+                     if ((TMPD div TMPS) = 0) and (i = $1) then
+                       BEGIN
+                         SetWord(TMPR, false, $0000);
+                         TMPD := (TMPD xor $FFFFFFFF) + 1;
+                         SetWord(TMPR, true, TMPD mod TMPS)
+                       END
+                     else
+                       BEGIN
+                         TMPR := TMPD div GetWord(TMPS, false) ;
+		                     SetWord(TMPR, true, (TMPD mod GetWord(TMPS, false)))
+                       END;
+		                 SetZN(TMPR) ;
+		                 C := false ;
+		                 SetResult(TMPR, OpAddr2, Size, M2, N2) ;
+		               END { if div by 0 }
+		             END { if size = 2 }
             END;
 
      iNEG: BEGIN
@@ -723,9 +723,9 @@ var
             V := False;
             if (Data > 0) then
               BEGIN
-              if GetBitsL(TMPD, NOB(Size)*8-Data, NOB(Size)*8-Data) = 1
-                then C:= true
-                else C:= false
+                if GetBitsL(TMPD, NOB(Size)*8-Data, NOB(Size)*8-Data) = 1
+                  then C:= true
+                  else C:= false
               END
             else
                 C := false;
@@ -843,14 +843,15 @@ var
 
      iEXG: BEGIN
             if CheckCond((((M1=$0) or (M1=$1)) and ((M2=$0) or (M2=$1))), 'Invalid Addressing Mode')
-            then BEGIN
+            then
+              BEGIN
                  FillTMP(TMPS, OpAddr1, Size, M1, N1);
                  FillTMP(TMPD, OpAddr2, Size, M2, N2);
                  SetResult(TMPS, OpAddr1, Size, M2, N2);
                  SetResult(TMPD, OpAddr2, Size, M1, N1);
                  V := false;
                  C := false;
-                 END { if valid address }
+               END { if valid address }
            END;
 
     iMOVEA: BEGIN
@@ -865,15 +866,15 @@ var
                  byteSize: write('(byte) for ');
                  wordSize: write('(word) for ');
                  longSize: write('(long) for ');
-                 END;{Size}
+              END;{Size}
               case M1 of
-		 $0: write('the register D', N1);
+                 $0: write('the register D', N1);
                  $1: write('the register A', N1);
                  $4: write('the memory address $', Word2Hex(A[N1]):4);
                  $6: write('the memory address $', Word2Hex(A[N1]):4);
                  $7: write('the memory address $', Word2Hex(A[N1]):4);
                  $3: write('the memory address $', Word2Hex(OpAddr1));
-                 END;{M1}
+              END;{M1}
               write(': ');
               readln(TMPD);
               SetZN(TMPD);
@@ -895,15 +896,17 @@ var
                      END;
                  $7: write('[$',Word2Hex(A[N1]),'] = $');
                  $3: write('[$',Word2Hex(OpAddr1):4,'] = $');
-                 END;{M1}
+              END;{M1}
               case Size of
                  byteSize: writeln(Byte2Hex(TMPS), ' (byte)');
                  wordSize: writeln(Word2Hex(TMPS), ' (word)');
                  longSize: writeln(Long2Hex(TMPS), ' (long)');
-                 END{Size}
+              END{Size}
            END;
 
-     iDSR: BEGIN writeln( 'Status Bits: H:', H, ' N:', N, ' Z:', Z, ' V:', V, ' C:', C ) END;
+     iDSR: BEGIN
+             writeln( 'Status Bits: H:', H, ' N:', N, ' Z:', Z, ' V:', V, ' C:', C )
+           END;
 
      iHLT: H := true ;  (* Set the Halt Status Bit to 1 (stops program) *)
 
@@ -958,26 +961,26 @@ BEGIN
      (* Menu *)
      while (option <> 'q') do
         BEGIN
-        identification;
-        write('Your Option : ');
-        readln(option);
-        case option of
-           'e' : BEGIN
-                 (* Execution on the simulator *)
-                 write('Name of the 68k binary program (".68b" will be added automatically): ');
-                 readln(program_name);
-		 Loader( concat(program_name,'.68b') );
-                 Controller; (* Start the simulator *)
-                 END;
-
-           'q' : writeln('Bye! and come again');
-
-           else writeln('Invalid Option. Please enter e or q.');
+          identification;
+          write('Your Option : ');
+          readln(option);
+          case option of
+            'e' : BEGIN
+                    (* Execution on the simulator *)
+                    write('Name of the 68k binary program (".68b" will be added automatically): ');
+                    readln(program_name);
+		                Loader( concat(program_name,'.68b') );
+                    Controller; (* Start the simulator *)
+                  END;
+             
+             'q' : writeln('Bye! and come again');
+             
+             else writeln('Invalid Option. Please enter e or q.');
            END;  (* case *)
 
-        writeln;
-        writeln('Press <Enter>.');
-        readln;
+          writeln;
+          writeln('Press <Enter>.');
+          readln;
         END; (* while *)
 END.
 {program Sim68k}
